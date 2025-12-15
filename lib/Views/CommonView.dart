@@ -1,7 +1,7 @@
 import 'dart:js';
 
 import 'package:flutter/material.dart';
-//
+
 Widget getCircleIndicator() {
   return Center(
     child: CircularProgressIndicator(

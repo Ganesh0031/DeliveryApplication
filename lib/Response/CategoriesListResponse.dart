@@ -21,7 +21,7 @@ class CategoriesListResponse {
     id = json['id'];
     title = json['title'];
 
-    /// FIX → convert int to double
+
     var p = json['price'];
     price = p is int ? p.toDouble() : p;
 
@@ -56,7 +56,7 @@ class CategoriesListResponse {
   Rating({this.rate, this.count});
 
   Rating.fromJson(Map<String, dynamic> json) {
-    /// FIX → convert int to double
+
     var r = json['rate'];
     rate = r is int ? r.toDouble() : r;
 

@@ -105,8 +105,6 @@ class MyCartScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-
-                            /// Quantity Box at bottom right
                             Align(
                               alignment: Alignment.centerRight,
                               child: Container(
@@ -172,12 +170,11 @@ class MyCartScreen extends StatelessWidget {
               ),
             ),
 
-            /// ---------- TOTAL PRICE ----------
-            /// ---------- COUPON + TOTAL + CHECKOUT ----------
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
@@ -197,73 +194,72 @@ class MyCartScreen extends StatelessWidget {
                         child: TextField(
                           decoration: InputDecoration(
                             hintText: "Enter Discount Code",
-                            contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
+                            isDense: true,
                           ),
+                          style: const TextStyle(fontSize: 14),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: () {
                           // TODO: Apply coupon logic
                         },
                         style: ElevatedButton.styleFrom(
-                     // backgroundColor: Colors.orange,
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                          backgroundColor: Colors.white,
+                          side: const BorderSide(color: Colors.orange),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text("Apply",style: TextStyle(color: Colors.orange),),
+                        child: const Text(
+                          "Apply",
+                          style: TextStyle(color: Colors.orange, fontSize: 14),
+                        ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   /// Subtotal
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Subtotal",
-                          style: TextStyle(fontSize: 16)),
+                      const Text("Subtotal", style: TextStyle(fontSize: 14)),
                       Text(
                         "\$${controller.total.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
                   /// Total
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text("Total",
-                          style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       Text(
                         "\$${controller.total.toStringAsFixed(2)}",
                         style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
+                            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   /// Checkout Button
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 45,
                     child: ElevatedButton(
                       onPressed: () {
                         // TODO: Checkout action
@@ -271,19 +267,20 @@ class MyCartScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
+                          borderRadius: BorderRadius.circular(22),
                         ),
                       ),
                       child: const Text(
                         "Checkout",
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
+                            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
+            )
+
 
           ],
         );

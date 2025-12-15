@@ -1,9 +1,13 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Presenter/CategoriesListPresenter.dart';
 import '../Response/CategoriesListResponse.dart';
+import '../Views/MVPView.dart';
 
 class HomeController extends GetxController implements CategoriesListGetView {
+
+  // Banner
   final PageController bannerController = PageController();
 
   final bannerImages = [
@@ -11,19 +15,22 @@ class HomeController extends GetxController implements CategoriesListGetView {
     "assets/real/banner2.jpg",
     "assets/real/banner3.jpg",
     "assets/real/banner5.jpg"
-  ].obs;
+  ];
 
+  // Categories
   final categories = <Map<String, dynamic>>[
     {"icon": Icons.devices_other, "name": "electronics"},
     {"icon": Icons.diamond_outlined, "name": "jewelery"},
     {"icon": Icons.man, "name": "men's clothing"},
     {"icon": Icons.woman, "name": "women's clothing"},
-  ].obs;
+  ];
 
   var selectedCategory = 0.obs;
 
-  // API Data
-  var productList = <CategoriesListResponse>[].obs;
+  // Data
+  var allProducts = <CategoriesListResponse>[].obs;
+  var filteredProducts = <CategoriesListResponse>[].obs;
+
   var isLoading = false.obs;
 
   late CategoriesListPresenter presenter;
@@ -32,23 +39,38 @@ class HomeController extends GetxController implements CategoriesListGetView {
   void onInit() {
     super.onInit();
     presenter = CategoriesListPresenter(this);
-
-    // Load first category by default
-    getProducts(categories[0]["name"]);
+    fetchProducts(categories[0]["name"]);
   }
 
   void changeCategory(int index) {
     selectedCategory.value = index;
-    getProducts(categories[index]["name"]);
+    fetchProducts(categories[index]["name"]);
   }
 
-  void getProducts(String category) {
+  void fetchProducts(String category) {
     presenter.getCategoriesListData(category);
   }
 
+  void searchProduct(String query) {
+    if (query.isEmpty) {
+      filteredProducts.assignAll(allProducts);
+    } else {
+      filteredProducts.assignAll(
+        allProducts.where(
+              (item) => item.title!
+              .toLowerCase()
+              .contains(query.toLowerCase()),
+        ).toList(),
+      );
+    }
+  }
+
+
   @override
-  void showCategoriesListDataGetResponse(List<CategoriesListResponse> response) {
-    productList.value = response;
+  void showCategoriesListDataGetResponse(
+      List<CategoriesListResponse> response) {
+    allProducts.assignAll(response);
+    filteredProducts.assignAll(response);
   }
 
   @override

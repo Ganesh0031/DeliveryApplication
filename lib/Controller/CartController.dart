@@ -7,18 +7,14 @@ class CartController extends GetxController {
   var cartList = <CartItem>[].obs;
 
   void addToCart(CategoriesListResponse product, int quantity) {
-    // Find if product already exists in cart
     int index = cartList.indexWhere((item) => item.product.id == product.id);
 
     if (index != -1) {
-      // Product exists, increase quantity
+
       cartList[index].quantity += quantity;
     } else {
-      // Product doesn't exist, add new item
       cartList.add(CartItem(product: product, quantity: quantity));
     }
-
-    // Refresh the list to update UI
     cartList.refresh();
   }
 
@@ -32,7 +28,7 @@ class CartController extends GetxController {
       cartList[index].quantity--;
       cartList.refresh();
     } else {
-      // If quantity is 1, remove item from cart
+
       cartList.removeAt(index);
     }
   }

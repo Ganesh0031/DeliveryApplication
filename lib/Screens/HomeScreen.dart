@@ -1,32 +1,14 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
 import '../Controller/HomeController.dart';
-import '../Presenter/CategoriesListPresenter.dart';
-import '../Response/CategoriesListResponse.dart';
-import '../Views/MVPView.dart';
 import 'ProductDetailsScreen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+  HomeScreen({super.key});
 
-class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetView {
   final HomeController controller = Get.put(HomeController());
-  late CategoriesListPresenter presenter;
-
-  @override
-  void initState() {
-    super.initState();
-    presenter = CategoriesListPresenter(this);
-
-    // Load default category
-    presenter.getCategoriesListData(controller.categories[0]["name"]);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +22,11 @@ class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetVie
               children: [
                 _topBar(),
                 _searchBar(),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 _bannerSlider(),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 _categoryList(),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _productGrid(),
               ],
             ),
@@ -54,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetVie
     );
   }
 
-  // ---------------------- UI WIDGETS ---------------------- //
 
   Widget _topBar() {
     return Padding(
@@ -73,25 +54,26 @@ class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetVie
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         height: 45,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          children: const [
-            Icon(Icons.search, color: Colors.grey),
-            SizedBox(width: 10),
+          children: [
+            const Icon(Icons.search, color: Colors.grey),
+            const SizedBox(width: 10),
             Expanded(
               child: TextField(
-                decoration: InputDecoration(
+                onChanged: controller.searchProduct,
+                decoration: const InputDecoration(
+                  hintText: "Search products...",
                   border: InputBorder.none,
-                  hintText: "Search...",
                 ),
               ),
             ),
-            Icon(Icons.filter_list, color: Colors.grey),
+            const Icon(Icons.filter_list, color: Colors.grey),
           ],
         ),
       ),
@@ -104,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetVie
       child: PageView.builder(
         controller: controller.bannerController,
         itemCount: controller.bannerImages.length,
-        itemBuilder: (context, index) {
+        itemBuilder: (_, index) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ClipRRect(
@@ -127,14 +109,11 @@ class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetVie
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.only(left: 16),
         itemCount: controller.categories.length,
-        itemBuilder: (context, index) {
-          bool isSelected = controller.selectedCategory.value == index;
+        itemBuilder: (_, index) {
+          final isSelected = controller.selectedCategory.value == index;
 
           return GestureDetector(
-            onTap: () {
-              controller.changeCategory(index);
-              presenter.getCategoriesListData(controller.categories[index]["name"]);
-            },
+            onTap: () => controller.changeCategory(index),
             child: Padding(
               padding: const EdgeInsets.only(right: 15),
               child: Column(
@@ -146,14 +125,14 @@ class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetVie
                     child: Icon(
                       controller.categories[index]["icon"],
                       color: isSelected ? Colors.orange : Colors.grey,
-                      size: 28,
                     ),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     controller.categories[index]["name"],
                     style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                      isSelected ? FontWeight.bold : FontWeight.normal,
                       color: isSelected ? Colors.orange : Colors.black,
                     ),
                   ),
@@ -168,9 +147,9 @@ class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetVie
 
   Widget _productGrid() {
     if (controller.isLoading.value) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.only(top: 40),
+      return const Padding(
+        padding: EdgeInsets.only(top: 40),
+        child: Center(
           child: CircularProgressIndicator(color: Colors.orange),
         ),
       );
@@ -180,129 +159,131 @@ class _HomeScreenState extends State<HomeScreen> implements CategoriesListGetVie
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 40),
-      itemCount: controller.productList.length,
+      itemCount: controller.filteredProducts.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
         childAspectRatio: 0.70,
       ),
-      itemBuilder: (context, index) {
-        var item = controller.productList[index];
+      itemBuilder: (_, index) {
+        final item = controller.filteredProducts[index];
+
+        // Sample color codes for the product (replace with your data)
+        final colorOptions = [
+          Colors.black,
+          Colors.red,
+          Colors.blue,
+          Colors.orange,
+        ];
+
+        // Use RxBool for heart toggle
+        final isFavorite = false.obs;
 
         return GestureDetector(
-            onTap: () {
-          Get.to(() => ProductDetailsScreen(item: item));
-        },
-        child: Stack(
-
-        children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  )
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-                    child: Image.network(
-                      item.image ?? "",
-                      height: 120,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      item.title ?? "",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Text(
-                      "\$${item.price}",
-                      style: const TextStyle(
-                        color: Colors.orange,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+          onTap: () => Get.to(() => ProductDetailsScreen(item: item)),
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                      child: Image.network(
+                        item.image ?? "",
+                        height: 120,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ),
 
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8, top: 6, bottom: 8),
-                    child: Row(
-                      children: const [
-                        CircleAvatar(radius: 5, backgroundColor: Colors.black),
-                        SizedBox(width: 5),
-                        CircleAvatar(radius: 5, backgroundColor: Colors.red),
-                        SizedBox(width: 5),
-                        CircleAvatar(radius: 5, backgroundColor: Colors.blue),
-                      ],
+                    // Heart icon top-right with toggle
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Obx(() => InkWell(
+                        onTap: () => isFavorite.value = !isFavorite.value,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            isFavorite.value
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            size: 20,
+                            color:
+                            isFavorite.value ? Colors.orange : Colors.grey,
+                          ),
+                        ),
+                      )),
                     ),
+                  ],
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    item.title ?? "",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
-            ),
 
-          ],
-        ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      // Price
+                      Text(
+                        "\$${item.price}",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      // Spacer pushes color circles to the right
+                      const Spacer(),
+
+                      // Color options
+                      Row(
+                        children: colorOptions.map((color) {
+                          return Container(
+                            margin: const EdgeInsets.only(left: 4),
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
-
       },
     );
   }
 
-  // ---------------------- PRESENTER CALLBACKS ---------------------- //
-
-  @override
-  void showCategoriesListDataGetResponse(List<CategoriesListResponse> response) {
-    controller.productList.assignAll(response);
-  }
-
-  @override
-  void showLoading() {
-    controller.isLoading.value = true;
-  }
-
-  @override
-  void hideLoading() {
-    controller.isLoading.value = false;
-  }
-
-  @override
-  void showError(String msg) {
-    // TODO: implement showError
-  }
 }
